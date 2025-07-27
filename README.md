@@ -30,7 +30,11 @@ A complete calculator built in Python that performs essential actuarial and fina
 - Loan amortization:
   - Interest vs principal per payment
   - Declining balance chart  
-- Retirement planner: Tracks yearly savings accumulation until retirement  
+- Retirement planner: Tracks yearly savings accumulation until retirement
+
+## 🔗 Link to Streamlit App
+
+- https://actuarial-calculator.streamlit.app/
 
 ## 💼 Why This Project?
 
