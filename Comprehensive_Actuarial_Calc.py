@@ -24,9 +24,7 @@ def show_homepage():  # Homepage
     - **Retirement Planning 🌴**: Project your retirement savings and withdrawal strategy.
 
     Select a calculator from the sidebar to get started!
-
-    Github Repo: https://github.com/krattansi/actuarial-calculator-python
-    """)
+    
     show_footer()
 
 
