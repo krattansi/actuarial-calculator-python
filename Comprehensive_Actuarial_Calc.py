@@ -24,7 +24,7 @@ def show_homepage():  # Homepage
     - **Retirement Planning 🌴**: Project your retirement savings and withdrawal strategy.
 
     Select a calculator from the sidebar to get started!
-    
+    """)
     show_footer()
 
 
