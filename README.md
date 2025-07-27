@@ -1,6 +1,6 @@
 # Comprehensive Actuarial Calculator (Python) 🧮
 
-A complete command-line calculator built in Python that performs essential actuarial and finance computations. These functions include time value of money, annuities, bond pricing, loan amortization schedules, and retirement planning, complete with exportable CSVs and visualizations.
+A complete calculator built in Python that performs essential actuarial and finance computations. These functions include time value of money, annuities, bond pricing, loan amortization schedules, and retirement planning, complete with exportable CSVs and visualizations. All features are deployed in a convenient Streamlit web app for easy use.
 
 ## 📌 Features
 
@@ -10,7 +10,8 @@ A complete command-line calculator built in Python that performs essential actua
 - Loan Amortization: Full monthly schedule saved to CSV with accompanying charts  
 - Retirement Planner: Simulates future retirement fund growth and 4% rule withdrawals with accompanying charts
 - Dynamic financial visualizations using `matplotlib`  
-- CSV export for loan amortization schedules  
+- CSV export for loan amortization schedules
+- Modern and interactive front-end using `streamlit`
 
 ## 🧮 Calculations Included
 
