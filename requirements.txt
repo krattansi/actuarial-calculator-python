@@ -1,4 +1,4 @@
 math
 pandas
-matplotlib.pyplot
+matplotlib
 streamlit
