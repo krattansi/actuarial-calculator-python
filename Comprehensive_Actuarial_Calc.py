@@ -1,263 +1,332 @@
+import streamlit as st
 import math
-import csv
+import pandas as pd
 import matplotlib.pyplot as plt
 
 
-# TVM
-def tvm_calculator():
-    print("\n--- TIME VALUE OF MONEY ---")
-    print("What would you like to calculate?")
-    print("1. Future Value (FV)")
-    print("2. Present Value (PV)")
-    print("3. Interest Rate (r)")
-    print("4. Number of periods (n)")
-
-    calc_type = input("Choose calculation type (1-4): ")
-
-    if calc_type == "1":  # Calculate FV
-        P = float(input("Enter present value (P): $"))
-        r = float(input("Enter annual interest rate (in %, e.g. 5): ")) / 100
-        n = int(input("Enter number of years: "))
-        m = int(input("Compounding frequency per year (e.g. 1, 2, 12): "))
-
-        FV = P * (1 + r / m) ** (n * m)
-        print(f"Future Value after {n} years: ${FV:,.2f}")
-
-        # Generate chart
-        create_tvm_chart(P, r, n, m, "FV")
-
-    elif calc_type == "2":  # Calculate PV
-        FV = float(input("Enter future value (FV): $"))
-        r = float(input("Enter annual interest rate (in %, e.g. 5): ")) / 100
-        n = int(input("Enter number of years: "))
-        m = int(input("Compounding frequency per year (e.g. 1, 2, 12): "))
-
-        P = FV / (1 + r / m) ** (n * m)
-        print(f"Present Value: ${P:,.2f}")
-
-        # Generate chart
-        create_tvm_chart(P, r, n, m, "PV")
-
-    elif calc_type == "3":  # Calculate rate
-        P = float(input("Enter present value (P): $"))
-        FV = float(input("Enter future value (FV): $"))
-        n = int(input("Enter number of years: "))
-        m = int(input("Compounding frequency per year (e.g. 1, 2, 12): "))
-
-        r = m * ((FV / P) ** (1 / (n * m)) - 1)
-        print(f"Required annual interest rate: {r * 100:.4f}%")
-
-    elif calc_type == "4":  # Calculate time
-        P = float(input("Enter present value (P): $"))
-        FV = float(input("Enter future value (FV): $"))
-        r = float(input("Enter annual interest rate (in %, e.g. 5): ")) / 100
-        m = int(input("Compounding frequency per year (e.g. 1, 2, 12): "))
-
-        n = math.log(FV / P) / (m * math.log(1 + r / m))
-        print(f"Time required: {n:.2f} years")
-
-    else:
-        print("Invalid choice.")
+def show_footer():  # Footer
+    st.markdown("---")
+    st.markdown(
+        "Made by Kazim Rattansi | Honors Actuarial Science Student at St. John's University")
 
 
-def create_tvm_chart(P, r, n, m, calc_type): # Create TVM Chart
+def show_homepage():  # Homepage
+    st.title("Comprehensive Actuarial Calculator 🧮")
+    st.markdown("""
+    This powerful tool helps you perform a variety of financial and actuarial calculations with ease. 
+    Whether you're planning for retirement, evaluating bonds, or analyzing loans, we've got you covered!
+
+    ### Available Calculators:
+    - **Time Value of Money ⏳**: Calculate FV, PV, interest rates, or time periods with visualizations.
+    - **Annuity Calculator 💰**: Analyze the PV and FV immediate, due, growing, or deferred annuities.
+    - **Bond Pricing 💵**: Determine bond prices and durations.
+    - **Loan Amortization 🏦**: Generate detailed csv loan schedules and visualize payments.
+    - **Retirement Planning 🌴**: Project your retirement savings and withdrawal strategy.
+
+    Select a calculator from the sidebar to get started!
+
+    Github Repo: https://github.com/krattansi/actuarial-calculator-python
+    """)
+    show_footer()
+
+
+def tvm_calculator():  # TVM Calculator
+    st.title("Comprehensive Actuarial Calculator 🧮")
+    st.header("Time Value of Money Calculator ⏳")
+    col1, col2 = st.columns([1, 1])
+
+    with col1:
+        calc_type = st.selectbox("Choose calculation type:", [
+            "Future Value (FV)",
+            "Present Value (PV)",
+            "Interest Rate (r)",
+            "Number of periods (n)"
+        ])
+
+        if calc_type == "Future Value (FV)":
+            PV = st.number_input("Enter present value (PV): $",
+                                min_value=0.0, value=1000.0)
+            r = st.number_input(
+                "Enter annual interest rate (in %, e.g. 5): ", min_value=0.0, value=5.0) / 100
+            n = st.number_input("Enter number of years:",
+                                min_value=1, value=5, step=1)
+            m = st.number_input(
+                "Compounding frequency per year (e.g. 1, 2, 12):", min_value=1, value=12, step=1)
+            calc_button = st.button("Calculate FV")
+        elif calc_type == "Present Value (PV)":
+            FV = st.number_input("Enter future value (FV): $",
+                                 min_value=0.0, value=1000.0)
+            r = st.number_input(
+                "Enter annual interest rate (in %, e.g. 5): ", min_value=0.0, value=5.0) / 100
+            n = st.number_input("Enter number of years:",
+                                min_value=1, value=5, step=1)
+            m = st.number_input(
+                "Compounding frequency per year (e.g. 1, 2, 12):", min_value=1, value=12, step=1)
+            calc_button = st.button("Calculate PV")
+        elif calc_type == "Interest Rate (r)":
+            PV = st.number_input("Enter present value (PV): $",
+                                min_value=0.0, value=1000.0)
+            FV = st.number_input("Enter future value (FV): $",
+                                 min_value=0.0, value=2000.0)
+            n = st.number_input("Enter number of years:",
+                                min_value=1, value=5, step=1)
+            m = st.number_input(
+                "Compounding frequency per year (e.g. 1, 2, 12):", min_value=1, value=12, step=1)
+            calc_button = st.button("Calculate Rate")
+        elif calc_type == "Number of periods (n)":
+            PV = st.number_input("Enter present value (PV): $",
+                                min_value=0.0, value=1000.0)
+            FV = st.number_input("Enter future value (FV): $",
+                                 min_value=0.0, value=2000.0)
+            r = st.number_input(
+                "Enter annual interest rate (in %, e.g. 5): ", min_value=0.0, value=5.0) / 100
+            m = st.number_input(
+                "Compounding frequency per year (e.g. 1, 2, 12):", min_value=1, value=12, step=1)
+            calc_button = st.button("Calculate Time")
+
+    with col2:
+        if calc_button:
+            if calc_type == "Future Value (FV)":
+                FV = PV * (1 + r / m) ** (n * m)
+                st.success(f"Future Value after {n} years: ${FV:,.2f}")
+            elif calc_type == "Present Value (PV)":
+                PV = FV / (1 + r / m) ** (n * m)
+                st.success(f"Present Value: ${PV:,.2f}")
+            elif calc_type == "Interest Rate (r)":
+                r = m * ((FV / PV) ** (1 / (n * m)) - 1)
+                st.success(f"Required annual interest rate: {r * 100:.4f}%")
+            elif calc_type == "Number of periods (n)":
+                n = math.log(FV / PV) / (m * math.log(1 + r / m))
+                st.success(f"Time required: {n:.2f} years")
+
+    if calc_button and calc_type in ["Future Value (FV)", "Present Value (PV)"]:
+        st.markdown("---")
+        if calc_type == "Future Value (FV)":
+            create_tvm_chart(PV, r, n, m, "FV")
+        else:
+            create_tvm_chart(FV, r, n, m, "PV")
+
+    show_footer()
+
+
+def create_tvm_chart(value, r, n, m, calc_type):
     years = []
     values = []
 
     for year in range(n + 1):
-        if calc_type == "FV": # FV chart
-            value = P * (1 + r / m) ** (year * m)
-        else:  # PV chart
-            FV = P * (1 + r / m) ** (n * m)
-            value = FV / (1 + r / m) ** (year * m)
-
+        if calc_type == "FV":
+            result = value * (1 + r / m) ** (year * m)
+        else:
+            result = value / (1 + r / m) ** (year * m)
         years.append(year)
-        values.append(value)
+        values.append(result)
 
-    plt.figure(figsize=(10, 6))
-    plt.plot(years, values, 'b-', linewidth=2, marker='o')
-    plt.title(f'Time Value of Money - {calc_type} Growth')
-    plt.xlabel('Years')
-    plt.ylabel('Value ($)')
-    plt.grid(True, alpha=0.3)
-    plt.ticklabel_format(style='plain', axis='y')
-
-    # Make y-axis labels $
-    ax = plt.gca()
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax.plot(years, values, 'b-', linewidth=2, marker='o')
+    ax.set_title(f'Time Value of Money - {calc_type} Growth')
+    ax.set_xlabel('Years')
+    ax.set_ylabel('Value ($)')
+    ax.grid(True, alpha=0.3)
     ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f'${x:,.0f}'))
-
     plt.tight_layout()
-    plt.show()
+    st.pyplot(fig)
 
 
-# Annuity Calcs
-def annuity_calculator():
-    print("\n--- ANNUITY CALCULATOR ---")
-    print("1. Annuity Immediate")
-    print("2. Annuity Due")
-    print("3. Growing Annuity")
-    print("4. Deferred Annuity")
+def annuity_calculator():  # Annuity Calculator
+    st.title("Comprehensive Actuarial Calculator 🧮")
+    st.header("Annuity Calculator 💰")
+    col1, col2 = st.columns([1, 1])
 
-    annuity_type = input("Choose annuity type (1-4): ")
+    with col1:
+        annuity_type = st.selectbox("Choose annuity type:", [
+            "Annuity Immediate",
+            "Annuity Due",
+            "Growing Annuity",
+            "Deferred Annuity"
+        ])
+        calc_choice = st.selectbox("Choose calculation:", [
+            "Present Value (PV)", "Future Value (FV)"])
 
-    print("\nWhat would you like to calculate?")
-    print("1. Present Value (PV)")
-    print("2. Future Value (FV)")
+        if annuity_type == "Annuity Immediate":
+            PMT = st.number_input(
+                "Enter payment per period: $", min_value=0.0, value=1000.0)
+            r = st.number_input(
+                "Interest rate per period (in %, e.g. 6): ", min_value=0.0, value=6.0) / 100
+            n = st.number_input("Number of periods:",
+                                min_value=1, value=10, step=1)
+            calc_button = st.button("Calculate")
+        elif annuity_type == "Annuity Due":
+            PMT = st.number_input(
+                "Enter payment per period: $", min_value=0.0, value=1000.0)
+            r = st.number_input(
+                "Interest rate per period (in %, e.g. 6): ", min_value=0.0, value=6.0) / 100
+            n = st.number_input("Number of periods:",
+                                min_value=1, value=10, step=1)
+            calc_button = st.button("Calculate")
+        elif annuity_type == "Growing Annuity":
+            PMT = st.number_input("Enter initial payment: $",
+                                  min_value=0.0, value=1000.0)
+            r = st.number_input(
+                "Interest rate per period (in %, e.g. 6): ", min_value=0.0, value=6.0) / 100
+            g = st.number_input(
+                "Growth rate per period (in %, e.g. 3): ", min_value=0.0, value=3.0) / 100
+            n = st.number_input("Number of periods:",
+                                min_value=1, value=10, step=1)
+            calc_button = st.button("Calculate")
+        elif annuity_type == "Deferred Annuity":
+            PMT = st.number_input(
+                "Enter payment per period: $", min_value=0.0, value=1000.0)
+            r = st.number_input(
+                "Interest rate per period (in %, e.g. 6): ", min_value=0.0, value=6.0) / 100
+            n = st.number_input("Number of payment periods:",
+                                min_value=1, value=10, step=1)
+            m = st.number_input("Number of deferral periods:",
+                                min_value=0, value=5, step=1)
+            calc_button = st.button("Calculate")
 
-    calc_choice = input("Choose calculation (1-2): ")
+    with col2:
+        if calc_button:
+            if annuity_type == "Annuity Immediate":
+                if calc_choice == "Present Value (PV)":
+                    pv = PMT * ((1 - (1 + r) ** -n) / r)
+                    st.success(
+                        f"Present Value of Immediate Annuity: ${pv:,.2f}")
+                elif calc_choice == "Future Value (FV)":
+                    fv = PMT * (((1 + r) ** n - 1) / r)
+                    st.success(
+                        f"Future Value of Immediate Annuity: ${fv:,.2f}")
+            elif annuity_type == "Annuity Due":
+                if calc_choice == "Present Value (PV)":
+                    pv = PMT * ((1 - (1 + r) ** -n) / r) * (1 + r)
+                    st.success(f"Present Value of Annuity Due: ${pv:,.2f}")
+                elif calc_choice == "Future Value (FV)":
+                    fv = PMT * (((1 + r) ** n - 1) / r) * (1 + r)
+                    st.success(f"Future Value of Annuity Due: ${fv:,.2f}")
+            elif annuity_type == "Growing Annuity":
+                if calc_choice == "Present Value (PV)":
+                    if r == g:
+                        pv = n * PMT / (1 + r)
+                    else:
+                        pv = PMT * (1 - ((1 + g) / (1 + r)) ** n) / (r - g)
+                    st.success(f"Present Value of Growing Annuity: ${pv:,.2f}")
+                elif calc_choice == "Future Value (FV)":
+                    if r == g:
+                        fv = n * PMT * (1 + r) ** (n - 1)
+                    else:
+                        fv = PMT * (((1 + r) ** n - (1 + g) ** n) / (r - g))
+                    st.success(f"Future Value of Growing Annuity: ${fv:,.2f}")
+            elif annuity_type == "Deferred Annuity":
+                if calc_choice == "Present Value (PV)":
+                    pv_immediate = PMT * ((1 - (1 + r) ** -n) / r)
+                    pv = pv_immediate / (1 + r) ** m
+                    st.success(
+                        f"Present Value of Deferred Annuity: ${pv:,.2f}")
+                elif calc_choice == "Future Value (FV)":
+                    fv_immediate = PMT * (((1 + r) ** n - 1) / r)
+                    fv = fv_immediate * ((1 + r) ** m)
+                    st.success(f"Future Value of Deferred Annuity: ${fv:,.2f}")
 
-    if annuity_type == "1":  # Annuity Immediate
-        immediate_annuity(calc_choice)
-    elif annuity_type == "2":  # Annuity Due
-        due_annuity(calc_choice)
-    elif annuity_type == "3":  # Growing Annuity
-        growing_annuity(calc_choice)
-    elif annuity_type == "4":  # Deferred Annuity
-        deferred_annuity(calc_choice)
-    else:
-        print("Invalid choice.")
-
-
-def immediate_annuity(calc_choice): # PV/FV for Immediate
-    PMT = float(input("Enter payment per period: $"))
-    r = float(input("Interest rate per period (in %, e.g. 6): ")) / 100
-    n = int(input("Number of periods: "))
-
-    if calc_choice == "1":  # Present Value
-        pv = PMT * ((1 - (1 + r) ** -n) / r)
-        print(f"Present Value of Immediate Annuity: ${pv:,.2f}")
-    elif calc_choice == "2":  # Future Value
-        fv = PMT * (((1 + r) ** n - 1) / r)
-        print(f"Future Value of Immediate Annuity: ${fv:,.2f}")
-    else:
-        print("Invalid choice.")
-
-
-def due_annuity(calc_choice): # PV/FV for Due
-    PMT = float(input("Enter payment per period: $"))
-    r = float(input("Interest rate per period (in %, e.g. 6): ")) / 100
-    n = int(input("Number of periods: "))
-
-    if calc_choice == "1":  # Present Value
-        pv = PMT * ((1 - (1 + r) ** -n) / r) * (1 + r)
-        print(f"Present Value of Annuity Due: ${pv:,.2f}")
-    elif calc_choice == "2":  # Future Value
-        fv = PMT * (((1 + r) ** n - 1) / r) * (1 + r)
-        print(f"Future Value of Annuity Due: ${fv:,.2f}")
-    else:
-        print("Invalid choice.")
-
-
-def growing_annuity(calc_choice): # PV/FV for Growing
-    PMT = float(input("Enter initial payment: $"))
-    r = float(input("Interest rate per period (in %, e.g. 6): ")) / 100
-    g = float(input("Growth rate per period (in %, e.g. 3): ")) / 100
-    n = int(input("Number of periods: "))
-
-    if calc_choice == "1":  # Present Value
-        if r == g:
-            pv = n * PMT / (1 + r)
-        else:
-            pv = PMT * (1 - ((1 + g) / (1 + r)) ** n) / (r - g)
-        print(f"Present Value of Growing Annuity: ${pv:,.2f}")
-    elif calc_choice == "2":  # Future Value
-        if r == g:
-            fv = n * PMT * (1 + r) ** (n - 1)
-        else:
-            fv = PMT * (((1 + r) ** n - (1 + g) ** n) / (r - g))
-        print(f"Future Value of Growing Annuity: ${fv:,.2f}")
-    else:
-        print("Invalid choice.")
-
-
-def deferred_annuity(calc_choice): # PV/FV for Deferred
-    PMT = float(input("Enter payment per period: $"))
-    r = float(input("Interest rate per period (in %, e.g. 6): ")) / 100
-    n = int(input("Number of payment periods: "))
-    m = int(input("Number of deferral periods: "))
-
-    if calc_choice == "1":  # Present Value
-        # PV of immediate annuity discounted back by deferral period
-        pv_immediate = PMT * ((1 - (1 + r) ** -n) / r)
-        pv = pv_immediate / (1 + r) ** m
-        print(f"Present Value of Deferred Annuity: ${pv:,.2f}")
-    elif calc_choice == "2":  # Future Value
-        # FV of annuity immediate, compounded forward by m deferral periods
-        fv_immediate = PMT * (((1 + r) ** n - 1) / r)
-        fv = fv_immediate * ((1 + r) ** m)
-        print(f"Future Value of Deferred Annuity: ${fv:,.2f}")
-    else:
-        print("Invalid choice.")
-
-# Bond Calcs
-def bond_pricing():
-    print("\n--- BOND PRICING ---")
-    face_value = float(input("Enter face value: $"))
-    coupon_rate = float(input("Enter annual coupon rate (in %, e.g. 5): ")) / 100
-    years = int(input("Enter years to maturity: "))
-    ytm = float(input("Enter yield to maturity (in %, e.g. 4): ")) / 100
-    frequency = int(input("Coupon payments per year (1=annual, 2=semi-annual): "))
-
-    # Calculate coupon
-    coupon_payment = (face_value * coupon_rate) / frequency
-    periods = years * frequency
-    period_rate = ytm / frequency
-
-    # Calculate PV of coupons
-    pv_coupons = coupon_payment * ((1 - (1 + period_rate) ** -periods) / period_rate)
-
-    # Calculate PV of face value
-    pv_face = face_value / (1 + period_rate) ** periods
-
-    # Bond price
-    bond_price = pv_coupons + pv_face
-
-    # Calculate Macaulay Duration
-    macaulay_duration = 0
-    for t in range(1, periods + 1):
-        if t < periods:  # Coupon payments
-            cash_flow = coupon_payment
-        else:  # Final payment (coupon + face value)
-            cash_flow = coupon_payment + face_value
-
-        pv_cash_flow = cash_flow / (1 + period_rate) ** t
-        weighted_time = (t / frequency) * pv_cash_flow
-        macaulay_duration += weighted_time
-
-    macaulay_duration = macaulay_duration / bond_price
-
-    # Calculate Modified Duration
-    modified_duration = macaulay_duration / (1 + ytm / frequency)
-
-    print(f"\nBond Price: ${bond_price:,.2f}")
-    print(f"Present Value of Coupons: ${pv_coupons:,.2f}")
-    print(f"Present Value of Face Value: ${pv_face:,.2f}")
-    print(f"Macaulay Duration: {macaulay_duration:.4f} years")
-    print(f"Modified Duration: {modified_duration:.4f} years")
-
-# Loan Amortization Schedule
-def loan_amortization():
-    print("\n--- LOAN AMORTIZATION ---")
-    principal = float(input("Enter loan amount: $"))
-    annual_rate = float(input("Enter annual interest rate (in %, e.g. 6): ")) / 100
-    years = int(input("Enter loan term in years: "))
-
-    monthly_rate = annual_rate / 12
-    n_payments = years * 12
-
-    # Calculate PMT
-    monthly_payment = principal * (monthly_rate * (1 + monthly_rate) ** n_payments) / (
-                (1 + monthly_rate) ** n_payments - 1)
-
-    print(f"Monthly Payment: ${monthly_payment:,.2f}")
-    print(f"Total Payments: ${monthly_payment * n_payments:,.2f}")
-    print(f"Total Interest: ${(monthly_payment * n_payments) - principal:,.2f}")
-
-    # Generate amortization schedule
-    generate_amortization_schedule(principal, monthly_rate, n_payments, monthly_payment)
+    show_footer()
 
 
-def generate_amortization_schedule(principal, monthly_rate, n_payments, monthly_payment): # Loan Schedule and Charts
+def bond_pricing():  # Bond Pricing
+    st.title("Comprehensive Actuarial Calculator 🧮")
+    st.header("Bond Pricing 💵")
+    col1, col2 = st.columns([1, 1])
+
+    with col1:
+        face_value = st.number_input(
+            "Enter face value: $", min_value=0.0, value=1000.0)
+        coupon_rate = st.number_input(
+            "Enter annual coupon rate (in %, e.g. 5): ", min_value=0.0, value=5.0) / 100
+        years = st.number_input(
+            "Enter years to maturity:", min_value=1, value=10, step=1)
+        ytm = st.number_input(
+            "Enter yield to maturity (in %, e.g. 4): ", min_value=0.0, value=4.0) / 100
+        frequency = st.number_input(
+            "Coupon payments per year (1=annual, 2=semi-annual):", min_value=1, value=2, step=1)
+        calc_button = st.button("Calculate")
+
+    with col2:
+        if calc_button:
+            coupon_payment = (face_value * coupon_rate) / frequency
+            periods = years * frequency
+            period_rate = ytm / frequency
+
+            pv_coupons = coupon_payment * \
+                         ((1 - (1 + period_rate) ** -periods) / period_rate)
+            pv_face = face_value / (1 + period_rate) ** periods
+            bond_price = pv_coupons + pv_face
+
+            macaulay_duration = 0
+            for t in range(1, periods + 1):
+                if t < periods:
+                    cash_flow = coupon_payment
+                else:
+                    cash_flow = coupon_payment + face_value
+                pv_cash_flow = cash_flow / (1 + period_rate) ** t
+                weighted_time = (t / frequency) * pv_cash_flow
+                macaulay_duration += weighted_time
+            macaulay_duration = macaulay_duration / bond_price
+            modified_duration = macaulay_duration / (1 + ytm / frequency)
+
+            st.success(f"Bond Price: ${bond_price:,.2f}")
+            st.write(f"Present Value of Coupons: ${pv_coupons:,.2f}")
+            st.write(f"Present Value of Face Value: ${pv_face:,.2f}")
+            st.write(f"Macaulay Duration: {macaulay_duration:.4f} years")
+            st.write(f"Modified Duration: {modified_duration:.4f} years")
+
+    show_footer()
+
+
+def loan_amortization():  # Loan Amortization
+    st.title("Comprehensive Actuarial Calculator 🧮")
+    st.header("Loan Amortization 🏦")
+    col1, col2 = st.columns([1, 1])
+
+    with col1:
+        principal = st.number_input(
+            "Enter loan amount: $", min_value=0.0, value=100000.0)
+        annual_rate = st.number_input(
+            "Enter annual interest rate (in %, e.g. 6): ", min_value=0.0, value=6.0) / 100
+        years = st.number_input(
+            "Enter loan term in years:", min_value=1, value=30, step=1)
+        calc_button = st.button("Calculate")
+
+    with col2:
+        if calc_button:
+            monthly_rate = annual_rate / 12
+            n_payments = years * 12
+            monthly_payment = principal * \
+                              (monthly_rate * (1 + monthly_rate) ** n_payments) / \
+                              ((1 + monthly_rate) ** n_payments - 1)
+
+            st.success(f"Monthly Payment: ${monthly_payment:,.2f}")
+            st.write(f"Total Payments: ${monthly_payment * n_payments:,.2f}")
+            st.write(
+                f"Total Interest: ${(monthly_payment * n_payments) - principal:,.2f}")
+
+    if calc_button:
+        st.markdown("---")
+        schedule = generate_amortization_schedule(
+            principal, monthly_rate, n_payments, monthly_payment)
+        df = pd.DataFrame(schedule)
+        st.dataframe(df)
+
+        csv = df.to_csv(index=False).encode('utf-8')
+        st.download_button(
+            label="Download Amortization Schedule as CSV",
+            data=csv,
+            file_name="loan_amortization.csv",
+            mime="text/csv"
+        )
+
+        create_amortization_chart(schedule)
+
+    show_footer()
+
+
+def generate_amortization_schedule(principal, monthly_rate, n_payments, monthly_payment):
     schedule = []
     balance = principal
 
@@ -275,158 +344,136 @@ def generate_amortization_schedule(principal, monthly_rate, n_payments, monthly_
             'Ending Balance': round(balance, 2)
         })
 
-    # Save to CSV
-    filename = "loan_amortization_.csv"
-    with open(filename, 'w', newline='') as file:
-        writer = csv.DictWriter(file,
-                                fieldnames=['Payment', 'Beginning Balance', 'Monthly Payment', 'Interest', 'Principal',
-                                            'Ending Balance'])
-        writer.writeheader()
-        writer.writerows(schedule)
-
-    print(f"Amortization schedule saved to {filename}")
-
-    # Create chart showing principal vs interest over time
-    create_amortization_chart(schedule)
+    return schedule
 
 
-def create_amortization_chart(schedule): # Loan Charts
+def create_amortization_chart(schedule):
     payments = [row['Payment'] for row in schedule]
     interest_payments = [row['Interest'] for row in schedule]
     principal_payments = [row['Principal'] for row in schedule]
-
-    plt.figure(figsize=(12, 8))
-
-    # Subplot 1: Principal vs Interest over time
-    plt.subplot(2, 1, 1)
-    plt.plot(payments, interest_payments, 'r-', label='Interest', linewidth=2)
-    plt.plot(payments, principal_payments, 'b-', label='Principal', linewidth=2)
-    plt.title('Principal vs Interest Payments Over Time')
-    plt.xlabel('Payment Number')
-    plt.ylabel('Payment Amount ($)')
-    plt.legend()
-    plt.grid(True, alpha=0.3)
-
-    # Subplot 2: Outstanding balance
     balances = [row['Ending Balance'] for row in schedule]
-    plt.subplot(2, 1, 2)
-    plt.plot(payments, balances, 'g-', linewidth=2)
-    plt.title('Outstanding Loan Balance')
-    plt.xlabel('Payment Number')
-    plt.ylabel('Balance ($)')
-    plt.grid(True, alpha=0.3)
+
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 8))
+
+    ax1.plot(payments, interest_payments, 'r-', label='Interest', linewidth=2)
+    ax1.plot(payments, principal_payments, 'b-',
+             label='Principal', linewidth=2)
+    ax1.set_title('Principal vs Interest Payments Over Time')
+    ax1.set_xlabel('Payment Number')
+    ax1.set_ylabel('Payment Amount ($)')
+    ax1.legend()
+    ax1.grid(True, alpha=0.3)
+
+    ax2.plot(payments, balances, 'g-', linewidth=2)
+    ax2.set_title('Outstanding Loan Balance')
+    ax2.set_xlabel('Payment Number')
+    ax2.set_ylabel('Balance ($)')
+    ax2.grid(True, alpha=0.3)
 
     plt.tight_layout()
-    plt.show()
+    st.pyplot(fig)
 
 
-# Retirement Calculator
-def retirement_planning():
-    print("\n--- RETIREMENT PLANNING CALCULATOR ---")
+def retirement_planning():  # Retirement Planning
+    st.title("Comprehensive Actuarial Calculator 🧮")
+    st.header("Retirement Planning Calculator 🌴")
+    col1, col2 = st.columns([1, 1])
 
-    current_age = int(input("Enter current age: "))
-    retirement_age = int(input("Enter planned retirement age: "))
-    current_savings = float(input("Enter current retirement savings: $"))
-    monthly_contribution = float(input("Enter monthly contribution: $"))
-    annual_return = float(input("Enter expected annual return (in %, e.g. 7): ")) / 100
+    with col1:
+        current_age = st.number_input(
+            "Enter current age:", min_value=0, value=30, step=1)
+        retirement_age = st.number_input(
+            "Enter planned retirement age:", min_value=0, value=65, step=1)
+        current_savings = st.number_input(
+            "Enter current retirement savings: $", min_value=0.0, value=10000.0)
+        monthly_contribution = st.number_input(
+            "Enter monthly contribution: $", min_value=0.0, value=500.0)
+        annual_return = st.number_input(
+            "Enter expected annual return (in %, e.g. 7): ", min_value=0.0, value=7.0) / 100
+        calc_button = st.button("Calculate")
 
-    years_to_retirement = retirement_age - current_age
-    months_to_retirement = years_to_retirement * 12
-    monthly_return = annual_return / 12
+    with col2:
+        if calc_button:
+            years_to_retirement = retirement_age - current_age
+            months_to_retirement = years_to_retirement * 12
+            monthly_return = annual_return / 12
 
-    # Future value of current savings
-    fv_current = current_savings * (1 + annual_return) ** years_to_retirement
+            fv_current = current_savings * \
+                         (1 + annual_return) ** years_to_retirement
+            fv_contributions = monthly_contribution * \
+                               (((1 + monthly_return) ** months_to_retirement - 1) / monthly_return)
+            total_retirement_funds = fv_current + fv_contributions
+            annual_withdrawal = total_retirement_funds * 0.04
+            monthly_withdrawal = annual_withdrawal / 12
 
-    # Future value of monthly contributions (annuity)
-    fv_contributions = monthly_contribution * (((1 + monthly_return) ** months_to_retirement - 1) / monthly_return)
+            st.success("Retirement Analysis:")
+            st.write(f"Years to retirement: {years_to_retirement}")
+            st.write(f"Future value of current savings: ${fv_current:,.2f}")
+            st.write(
+                f"Future value of contributions: ${fv_contributions:,.2f}")
+            st.write(f"Total retirement funds: ${total_retirement_funds:,.2f}")
+            st.write(
+                f"Sustainable annual withdrawal (4% rule): ${annual_withdrawal:,.2f}")
+            st.write(
+                f"Sustainable monthly withdrawal: ${monthly_withdrawal:,.2f}")
 
-    total_retirement_funds = fv_current + fv_contributions
+    if calc_button:
+        st.markdown("---")
+        create_retirement_chart(current_age, retirement_age,
+                                current_savings, monthly_contribution, annual_return)
 
-    print(f"\nRetirement Analysis:")
-    print(f"Years to retirement: {years_to_retirement}")
-    print(f"Future value of current savings: ${fv_current:,.2f}")
-    print(f"Future value of contributions: ${fv_contributions:,.2f}")
-    print(f"Total retirement funds: ${total_retirement_funds:,.2f}")
-
-    # Calculate sustainable withdrawal (4% rule)
-    annual_withdrawal = total_retirement_funds * 0.04
-    monthly_withdrawal = annual_withdrawal / 12
-
-    print(f"\nSustainable annual withdrawal (4% rule): ${annual_withdrawal:,.2f}")
-    print(f"Sustainable monthly withdrawal: ${monthly_withdrawal:,.2f}")
-
-    # Create retirement projection chart
-    create_retirement_chart(current_age, retirement_age, current_savings, monthly_contribution, annual_return)
+    show_footer()
 
 
-def create_retirement_chart(current_age, retirement_age, current_savings, monthly_contribution, annual_return): # Retirement Chart
+def create_retirement_chart(current_age, retirement_age, current_savings, monthly_contribution, annual_return):
     ages = []
     balances = []
-
     balance = current_savings
     monthly_return = annual_return / 12
 
     for age in range(current_age, retirement_age + 1):
         ages.append(age)
         balances.append(balance)
-
-        # Add monthly contributions (if not at retirement age)
         if age < retirement_age:
             for month in range(12):
                 balance = balance * (1 + monthly_return) + monthly_contribution
 
-    plt.figure(figsize=(10, 6))
-    plt.plot(ages, balances, 'g-', linewidth=2, marker='o')
-    plt.title('Retirement Savings Growth Over Time')
-    plt.xlabel('Age')
-    plt.ylabel('Retirement Savings ($)')
-    plt.grid(True, alpha=0.3)
-    plt.ticklabel_format(style='plain', axis='y')
-
-    # Format y-axis as $
-    ax = plt.gca()
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax.plot(ages, balances, 'g-', linewidth=2, marker='o')
+    ax.set_title('Retirement Savings Growth Over Time')
+    ax.set_xlabel('Age')
+    ax.set_ylabel('Retirement Savings ($)')
+    ax.grid(True, alpha=0.3)
     ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f'${x:,.0f}'))
-
     plt.tight_layout()
-    plt.show()
-
-# Menu
-def show_menu():
-    print("\n" + "=" * 50)
-    print("COMPREHENSIVE ACTUARIAL CALCULATOR")
-    print("=" * 50)
-    print("1. Time Value of Money")
-    print("2. Annuity Calculator")
-    print("3. Bond Pricing")
-    print("4. Loan Amortization")
-    print("5. Retirement Planning")
-    print("6. Exit")
-    print("=" * 50)
+    st.pyplot(fig)
 
 
-def main():
-    print("Welcome to the Comprehensive Actuarial Calculator!")
-    print("This tool provides various financial and actuarial calculations.")
+def main():  # Main App
+    st.set_page_config(page_title="Actuarial Calculator",
+                       page_icon="📊", layout="wide")
+    menu = [
+        "Home 🏠",
+        "Time Value of Money ⏳",
+        "Annuity Calculator 💰",
+        "Bond Pricing 💵",
+        "Loan Amortization 🏦",
+        "Retirement Planning 🌴"
+    ]
+    choice = st.sidebar.selectbox("Select Calculator", menu)
 
-    while True:
-        show_menu()
-        choice = input("Choose an option (1-6): ")
-
-        if choice == "1":
-            tvm_calculator()
-        elif choice == "2":
-            annuity_calculator()
-        elif choice == "3":
-            bond_pricing()
-        elif choice == "4":
-            loan_amortization()
-        elif choice == "5":
-            retirement_planning()
-        elif choice == "6":
-            print("Thank you for using the Actuarial Calculator!")
-            break
-        else:
-            print("Invalid input, please try again.")
+    if choice == "Home 🏠":
+        show_homepage()
+    elif choice == "Time Value of Money ⏳":
+        tvm_calculator()
+    elif choice == "Annuity Calculator 💰":
+        annuity_calculator()
+    elif choice == "Bond Pricing 💵":
+        bond_pricing()
+    elif choice == "Loan Amortization 🏦":
+        loan_amortization()
+    elif choice == "Retirement Planning 🌴":
+        retirement_planning()
 
 
 if __name__ == "__main__":
