@@ -1,16 +1,17 @@
 # Comprehensive Actuarial Calculator (Python) 🧮
 
-A complete calculator built in Python that performs essential actuarial and finance computations. These functions include time value of money, annuities, bond pricing, loan amortization schedules, and retirement planning, complete with exportable CSVs and visualizations. All features are deployed in a convenient Streamlit web app for easy use.
+A complete calculator built in Python that performs essential actuarial and finance computations. These functions include time value of money, annuities, bond pricing, loan amortization schedules, and retirement planning, complete with exportable CSVs, visualizations, and sensitivity analyses. All features are deployed in a convenient Streamlit web app for easy use.
 
 ## 📌 Features
 
-- Time Value of Money (PV, FV, Rate, Periods with growth chart)  
+- Time Value of Money (PV, FV, Rate, PMT, Periods with growth chart)  
 - Annuity Calculator: Immediate, Due, Growing, and Deferred (PV/FV)  
 - Bond Pricing: PV of coupons and face value as well as Modified and Macaulay durations with user-defined YTM  
-- Loan Amortization: Full monthly schedule saved to CSV with accompanying charts  
+- Loan Amortization: Full monthly schedule saved to CSV with accompanying charts and optional additional payments 
 - Retirement Planner: Simulates future retirement fund growth and 4% rule withdrawals with accompanying charts
 - Dynamic financial visualizations using `matplotlib`  
 - CSV export for loan amortization schedules
+- Sensitivity analyses for all appropriate modules using `numpy`
 - Modern and interactive front-end using `streamlit`
 
 ## 🧮 Calculations Included
@@ -31,6 +32,7 @@ A complete calculator built in Python that performs essential actuarial and fina
   - Interest vs principal per payment
   - Declining balance chart  
 - Retirement planner: Tracks yearly savings accumulation until retirement
+- Sensitivity analyses
 
 ## 🔗 Link to Streamlit App
 
