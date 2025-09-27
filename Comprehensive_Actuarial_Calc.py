@@ -1,7 +1,7 @@
 import streamlit as st
 import math
 import pandas as pd
-import matplotlib.pyplot as plt
+import plotly.graph_objects as go
 import numpy as np
 
 
@@ -18,9 +18,9 @@ def show_homepage():  # Homepage
     Whether you're planning for retirement, evaluating bonds, or analyzing loans, we've got you covered!
     ### Available Calculators:
     - **Time Value of Money ⏳**: Calculate FV, PV, periodic payments, interest rates, or time periods with visualizations and sensitivity analysis.
-    - **Annuity Calculator 💰**: Analyze the PV and FV of immediate, due, growing, or deferred annuities with sensitivity analysis.
+    - **Annuity Calculator 💰**: Analyze the PV and FV immediate, due, growing, or deferred annuities with sensitivity analysis.
     - **Bond Pricing 💵**: Determine bond prices and durations with sensitivity analysis.
-    - **Loan Amortization 🏦**: Generate detailed CSV loan schedules and visualize payments.
+    - **Loan Amortization 🏦**: Generate detailed csv loan schedules and visualize payments.
     - **Retirement Planning 🌴**: Project your retirement savings and withdrawal strategy with visualizations and sensitivity analysis.
     Select a calculator from the sidebar to get started!
     """)
@@ -32,15 +32,16 @@ def create_sensitivity_analysis(base_value, shock_range, calculation_function, t
                                 xlabel="Interest Rate Shock (%)", ylabel="Value ($)"):
     shocked_values = [calculation_function(shock) for shock in shock_range]
 
-    fig, ax = plt.subplots(figsize=(10, 6))
-    ax.plot(shock_range * 100, shocked_values, 'r-', linewidth=2)
-    ax.set_title(title)
-    ax.set_xlabel(xlabel)
-    ax.set_ylabel(ylabel)
-    ax.grid(True, alpha=0.3)
-    ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f'${x:,.0f}'))
-    plt.tight_layout()
-    st.pyplot(fig)
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=shock_range * 100, y=shocked_values,
+                             mode='lines', line=dict(color='red', width=2)))
+
+    fig.update_layout(
+        title_text=title,
+        xaxis_title=xlabel,
+        yaxis_title=ylabel,
+        yaxis_tickprefix='$', yaxis_tickformat=',.0f')
+    st.plotly_chart(fig, use_container_width=True)
 
 
 def tvm_calculator():  # TVM Calculator
@@ -191,15 +192,17 @@ def create_tvm_chart(value, r, n, m, calc_type, PMT=0, payment_at_beginning=Fals
                                                       if payment_at_beginning else PMT * ((1 + r/m) ** (year*m) - 1) / (r/m) / (1 + r/m) ** (year*m)) if PMT > 0 else value / (1 + r/m) ** (year*m)
         years.append(year)
         values.append(result)
-    fig, ax = plt.subplots(figsize=(10, 6))
-    ax.plot(years, values, 'b-', linewidth=2, marker='o')
-    ax.set_title(f'Time Value of Money - {calc_type} Growth')
-    ax.set_xlabel('Years')
-    ax.set_ylabel('Value ($)')
-    ax.grid(True, alpha=0.3)
-    ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f'${x:,.0f}'))
-    plt.tight_layout()
-    st.pyplot(fig)
+
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=years, y=values, mode='lines+markers',
+                             line=dict(color='blue', width=2)))
+
+    fig.update_layout(
+        title_text=f'Time Value of Money - {calc_type} Growth',
+        xaxis_title='Years',
+        yaxis_title='Value ($)',
+        yaxis_tickprefix='$', yaxis_tickformat=',.0f')
+    st.plotly_chart(fig, use_container_width=True)
 
 
 def annuity_calculator():  # Annuity Calculator
@@ -482,24 +485,23 @@ def create_amortization_chart(schedule):
     principal_payments = [row['Principal'] for row in schedule]
     balances = [row['Ending Balance'] for row in schedule]
 
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 8))
-    ax1.plot(payments, interest_payments, 'r-', label='Interest', linewidth=2)
-    ax1.plot(payments, principal_payments, 'b-',
-             label='Principal', linewidth=2)
-    ax1.set_title('Principal vs Interest Payments Over Time')
-    ax1.set_xlabel('Payment Number')
-    ax1.set_ylabel('Payment Amount ($)')
-    ax1.legend()
-    ax1.grid(True, alpha=0.3)
+    # Chart 1: Principal vs Interest
+    fig1 = go.Figure()
+    fig1.add_trace(go.Scatter(x=payments, y=interest_payments,
+                              mode='lines', name='Interest', line=dict(color='red', width=2)))
+    fig1.add_trace(go.Scatter(x=payments, y=principal_payments,
+                              mode='lines', name='Principal', line=dict(color='blue', width=2)))
+    fig1.update_layout(title_text='Principal vs Interest Payments Over Time',
+                       xaxis_title='Payment Number', yaxis_title='Payment Amount ($)')
+    st.plotly_chart(fig1, use_container_width=True)
 
-    ax2.plot(payments, balances, 'g-', linewidth=2)
-    ax2.set_title('Outstanding Loan Balance')
-    ax2.set_xlabel('Payment Number')
-    ax2.set_ylabel('Balance ($)')
-    ax2.grid(True, alpha=0.3)
-
-    plt.tight_layout()
-    st.pyplot(fig)
+    # Chart 2: Outstanding Balance
+    fig2 = go.Figure()
+    fig2.add_trace(go.Scatter(x=payments, y=balances,
+                              mode='lines', name='Balance', line=dict(color='green', width=2)))
+    fig2.update_layout(title_text='Outstanding Loan Balance',
+                       xaxis_title='Payment Number', yaxis_title='Balance ($)')
+    st.plotly_chart(fig2, use_container_width=True)
 
 
 def retirement_planning():  # Retirement Planning
@@ -570,15 +572,16 @@ def create_retirement_chart(current_age, retirement_age, current_savings, monthl
         if age < retirement_age:
             for _ in range(12):
                 balance = balance * (1 + monthly_return) + monthly_contribution
-    fig, ax = plt.subplots(figsize=(10, 6))
-    ax.plot(ages, balances, 'g-', linewidth=2, marker='o')
-    ax.set_title('Retirement Savings Growth Over Time')
-    ax.set_xlabel('Age')
-    ax.set_ylabel('Retirement Savings ($)')
-    ax.grid(True, alpha=0.3)
-    ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: f'${x:,.0f}'))
-    plt.tight_layout()
-    st.pyplot(fig)
+
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=ages, y=balances, mode='lines+markers',
+                             line=dict(color='green', width=2)))
+    fig.update_layout(
+        title_text='Retirement Savings Growth Over Time',
+        xaxis_title='Age',
+        yaxis_title='Retirement Savings ($)',
+        yaxis_tickprefix='$', yaxis_tickformat=',.0f')
+    st.plotly_chart(fig, use_container_width=True)
 
 
 def main():  # Main App
