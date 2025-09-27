@@ -6,17 +6,18 @@ A complete calculator built in Python that performs essential actuarial and fina
 
 - Time Value of Money (PV, FV, Rate, PMT, Periods with growth chart)  
 - Annuity Calculator: Immediate, Due, Growing, and Deferred (PV/FV)  
-- Bond Pricing: PV of coupons and face value as well as Modified and Macaulay durations with user-defined YTM  
+- Bond Pricing: PV of coupons and face value, as well as Modified and Macaulay durations with user-defined YTM  
 - Loan Amortization: Full monthly schedule saved to CSV with accompanying charts and optional additional payments 
 - Retirement Planner: Simulates future retirement fund growth and 4% rule withdrawals with accompanying charts
-- Dynamic financial visualizations using `matplotlib`  
+- Dynamic financial visualizations using `plotly`  
 - CSV export for loan amortization schedules
 - Sensitivity analyses for all appropriate modules using `numpy`
+- Data handling using `pandas`
 - Modern and interactive front-end using `streamlit`
 
 ## 🧮 Calculations Included
 
-- **TVM**: Supports compound interest on different compounding frequencies, can calculate FV, PV, rate, or # of periods
+- **TVM**: Supports compound interest on different compounding frequencies, can calculate FV, PV, PMT, rate, or # of periods
 - **Annuities**:
   - Annuity Immediate & Due: PV and FV formulas with compounding
   - Growing Annuities: Supports PV and FV with differing growth and interest rates  
