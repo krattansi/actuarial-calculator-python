@@ -37,7 +37,7 @@ A complete calculator built in Python that performs essential actuarial and fina
 
 ## 🔗 Link to Streamlit App
 
-- https://actuarial-calculator.streamlit.app/
+- [https://actuarial-calculator.streamlit.app/](https://actuarial-calculator-python.streamlit.app/)
 
 ## 💼 Why This Project?
 
